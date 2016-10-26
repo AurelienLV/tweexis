@@ -4,11 +4,47 @@
         <meta charset="utf-8">
         <title>Tweexis</title>
         <style type="text/css">
-            
+            h1 {
+                text-align: center;
+            }
+            hr {
+                border: 1px solid darkblue;
+            }
+            #connection {
+                text-align: center;
+            }
+            input {
+                border-radius: 8px;
+                border: 1px solid black;
+                font-size: 16px;
+                width: 200px;
+                margin-top: 6px;
+                padding: 2px 5px;
+            }
+            #submit {
+                width: 212px;
+                background-color: darkblue;
+                color: white;
+            }
         </style>
     </head>
     <body>
-        
+        <h1>Tweexis</h1><hr />
+        <div id="container">
+            <div id="connection">
+                <form id="form">
+                    <div class="connection">
+                        <input type="text" id="username"  />
+                    </div>
+                    <div class="connection">
+                        <input type="password" id="password" />
+                    </div>
+                    <div class="connection">
+                        <input type="submit" id="submit" />
+                    </div>
+                </form>
+            </div>
+        </div>
         <script language="JavaScript">
             
         </script>
