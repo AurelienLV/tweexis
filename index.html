@@ -4,14 +4,18 @@
         <meta charset="utf-8">
         <title>Tweexis</title>
         <style type="text/css">
+            body {
+                font-size: 1.2em;
+            }
             h1 {
-                font-size: 4em;
+                font-size: 3em;
                 text-align: center;
                 margin: 2px;
             }
-            #connection {
+            #connection, #search {
                 margin-top: 20px;
                 text-align: center;
+                margin-bottom: 30px;
             }
             input {
                 border-radius: 8px;
@@ -21,10 +25,10 @@
                 margin-top: 6px;
                 padding: 2px 5px;
             }
-            #submit {
+            #submit, #search_submit {
                 width: 10.8em;
-                background-color: darkblue;
-                color: white;
+                background-color: #ddddff;
+                color: #666;
             }
             #onglets {
                 font-size: 1.2em;
@@ -40,7 +44,7 @@
             #onglets li {
                 float : left;
                 height : 30px;
-                background-color: #F4F9FD;
+                background-color: #ddddff;
                 margin : 2px 2px 0 2px !important;
                 margin : 1px 2px 0 2px;
                 border : 1px solid #9EA0A1;
@@ -63,32 +67,95 @@
                 border-bottom : 1px solid #9EA0A1;
                 padding-bottom : 34px;
             }
+            #search_submit {
+                width: auto;
+            }
+            #me, #signout_link {
+                display: inline-block;
+                margin-left: 10px;
+                color: #666;
+                width: auto;
+                border: 2px solid black;
+                padding: 3px;
+                border-radius: 10px;
+                text-decoration: none;
+                background-color: #ddddff;
+            }
+            #me:hover, #signout_link:hover {
+                background-color: white;
+            }
+            #content {
+                margin-top: 30px;
+                text-align: center;
+            }
+            table {
+                margin: auto;
+            }
+            th, td {
+                text-align: center;
+                border-bottom: 1px solid grey;
+            }
         </style>
     </head>
     <body>
         <h1>Tweexis</h1>
+
+        <div id="connection">
+            <div id="signout">
+                <a href="#" id="signout_link">Se connecter avec un autre compte</a>
+            </div>
+            <form id="form">
+                <div class="connection">
+                    <input type="text" id="username" placeholder="Identifiant" />
+                </div>
+                <div class="connection">
+                    <input type="password" id="password" placeholder="Mot de passe" />
+                </div>
+                <div class="connection">
+                    <input type="submit" id="submit" value="Se connecter" />
+                </div>
+            </form>
+        </div>
+        
+        <form id="search">
+            <input type="text" placeholder="Chercher un compte" />
+            <input type="submit" id="search_submit" value="OK" />
+            <a href="#" id="me">Moi</a>
+        </form>
+        
         <div id="container">            
             <div id="menu">
                 <ul id="onglets">
-                    <li class="active"><a href="#" id="profile_link"> Profil </a></li>
-                    <li><a href="#" id="followers_link"> Abonnés </a></li>
+                    <li class="active"><a href="#" id="followers_link"> Abonnés </a></li>
                     <li><a href="#" id="followings_link"> Abonnements </a></li>
+                    <li><a href="#" id="favorites_link"> Favoris </a></li>
                 </ul>
             </div>
             
             <div id="content">
-                <div id="connection">
-                    <form id="form">
-                        <div class="connection">
-                            <input type="text" id="username"  />
-                        </div>
-                        <div class="connection">
-                            <input type="password" id="password" />
-                        </div>
-                        <div class="connection">
-                            <input type="submit" id="submit" />
-                        </div>
-                    </form>
+                <form id="add_fav">
+                    <input type="text" placeholder="Entrer un compte" />
+                    <input type="submit" id="add_submit" value="Ajouter aux favoris" />
+                </form>
+                
+                <div id="follow_content">
+                    <p id="count_followers">Nombre d'abonnés : <span class='count_followers'></span></p>
+                    <p id="count_followings">Nombre d'abonnements : <span class='count_followings'></span></p>
+                    <p id="count_fav">Nombre de favoris : <span class='count_fav'></span></p>
+                    <table id="follows">
+                        <tr>
+                            <th>Pseudo</th>
+                            <th>Identifiant</th>
+                            <th>Nombre d'abonnés</th>
+                            <th>Nombre d'abonnements</th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
