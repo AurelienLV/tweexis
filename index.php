@@ -1,5 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+    
+    <?php
+        require_once("twitteroauth-master/autoload.php");
+        session_start();
+        require_once("twitteroauth-master/src/TwitterOAuth.php"); //Path to twitteroauth library
+
+        $twitteruser = "Lynus1990";
+        $notweets = 30;
+        $consumerkey = "ZRdeOBWT80jYi1XDXIHn3mQO4";
+        $consumersecret = "Z1pR8rBDvkChGdJCa1Nxs5tUdcue5S1kQkSAmdqxscU6q5upJX";
+        $accesstoken = "537389908-hbnuUkpfPqHSz1tJptxcLsOjOZvraDtdILXKd3FK";
+        $accesstokensecret = "djWWWjur74S0OsHRdfUWxry4X8iXwOVrD3A0rS60a896D";
+
+        function getConnectionWithAccessToken($cons_key, $cons_secret, $oauth_token, $oauth_token_secret) {
+          $connection = new Abraham\TwitterOAuth\TwitterOAuth($cons_key, $cons_secret, $oauth_token, $oauth_token_secret);
+          return $connection;
+        }
+
+        $connection = getConnectionWithAccessToken($consumerkey, $consumersecret, $accesstoken, $accesstokensecret);
+
+        //$content = $connection->get('followers/ids', array('user_id' => '537389908'));
+        //$content = $connection->get('friends/ids', array('screen_name' => 'Lynus1990'));
+    ?>
+
     <head>
         <meta charset="utf-8">
         <title>Tweexis</title>
@@ -95,32 +119,17 @@
                 text-align: center;
                 border-bottom: 1px solid grey;
             }
+            .alert {
+                color: red;
+            }
         </style>
     </head>
     <body>
         <h1>Tweexis</h1>
-
-        <div id="connection">
-            <div id="signout">
-                <a href="#" id="signout_link">Se connecter avec un autre compte</a>
-            </div>
-            <form id="form">
-                <div class="connection">
-                    <input type="text" id="username" placeholder="Identifiant" />
-                </div>
-                <div class="connection">
-                    <input type="password" id="password" placeholder="Mot de passe" />
-                </div>
-                <div class="connection">
-                    <input type="submit" id="submit" value="Se connecter" />
-                </div>
-            </form>
-        </div>
         
         <form id="search">
-            <input type="text" placeholder="Chercher un compte" />
+            <input type="text" placeholder="Chercher un compte" id="search_user" />
             <input type="submit" id="search_submit" value="OK" />
-            <a href="#" id="me">Moi</a>
         </form>
         
         <div id="container">            
@@ -159,8 +168,71 @@
                 </div>
             </div>
         </div>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
         <script language="JavaScript">
-            
+            $( document ).ready(function() {
+                function redirect(u, o) {
+                    document.location.href = 'index.php?user='+u;
+                    return false;
+                }
+                var getUrlParameter = function getUrlParameter(sParam) {
+                    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                        sURLVariables = sPageURL.split('&'),
+                        sParameterName,
+                        i;
+
+                    for (i = 0; i < sURLVariables.length; i++) {
+                        sParameterName = sURLVariables[i].split('=');
+
+                        if (sParameterName[0] === sParam) {
+                            return sParameterName[1] === undefined ? true : sParameterName[1];
+                        }
+                    }
+                };
+                var user = getUrlParameter('user');
+                init();
+
+                $('#search_submit').click(function() {
+                    user = $('#search_user').val();
+                    return redirect(user);
+                });
+
+                function init() {
+                    $('#count_followers').show();
+                    $('#count_followings').hide();
+                    $('#count_fav').hide();
+                    $('#add_fav').hide();
+                }
+                
+                $('#followers_link').click(function() {
+                    $('li').removeClass('active');
+                    $(this).parent().addClass('active');
+                    init();
+                });
+                
+                $('#followings_link').click(function() {
+                    $('li').removeClass('active');
+                    $(this).parent().addClass('active');
+                    $('#count_followings').show();
+                    $('#count_followers').hide();
+                    $('#count_fav').hide();
+                    $('#add_fav').hide();
+                });
+                
+                $('#favorites_link').click(function() {
+                    $('li').removeClass('active');
+                    $(this).parent().addClass('active');
+                    $('#count_fav').show();
+                    $('#count_followers').hide();
+                    $('#count_followings').hide();
+                    $('#add_fav').show();
+                });
+
+                /*if (onglet === 0) {
+                    var result = <?php /*echo $connection->get('followers/ids', array('screen_name' => $_GET['user']));*/ ?>
+                    alert(result);
+                }*/
+            });
         </script>
     </body>
 </html>
