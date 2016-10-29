@@ -1,38 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    
-    <?php
-        require_once("twitteroauth-master/autoload.php");
-        require_once("twitteroauth-master/src/TwitterOAuth.php"); //Path to twitteroauth library
-        session_start();
-
-        if (!isset($_SESSION['connexion'])) {
-            $twitteruser = "Lynus1990";
-            $notweets = 30;
-            $consumerkey = "ZRdeOBWT80jYi1XDXIHn3mQO4";
-            $consumersecret = "Z1pR8rBDvkChGdJCa1Nxs5tUdcue5S1kQkSAmdqxscU6q5upJX";
-            $accesstoken = "537389908-hbnuUkpfPqHSz1tJptxcLsOjOZvraDtdILXKd3FK";
-            $accesstokensecret = "djWWWjur74S0OsHRdfUWxry4X8iXwOVrD3A0rS60a896D";
-            function getConnectionWithAccessToken($cons_key, $cons_secret, $oauth_token, $oauth_token_secret) {
-              $connection = new Abraham\TwitterOAuth\TwitterOAuth($cons_key, $cons_secret, $oauth_token, $oauth_token_secret);
-              return $connection;
-            }
-
-            $connection = getConnectionWithAccessToken($consumerkey, $consumersecret, $accesstoken, $accesstokensecret);
-            $_SESSION['connexion'] = $connection;
-        }
-
-        function readMyFile()
-        {
-            $filename = 'accounts.txt';
-            if (is_file($filename)) {
-                $content = file_get_contents($filename);
-                return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", ',', htmlspecialchars($content));
-            }
-            return false;
-        }
-    ?>
-
     <head>
         <meta charset="utf-8">
         <title>Tweexis</title>
@@ -90,7 +57,10 @@
                 border-bottom : 1px solid #9EA0A1;
                 padding-bottom : 34px;
             }
-            #me, #signout_link {
+            .form {
+                text-align: center;
+            }
+            #ok {
                 display: inline-block;
                 margin-left: 10px;
                 color: #666;
@@ -101,7 +71,7 @@
                 text-decoration: none;
                 background-color: #ddddff;
             }
-            #me:hover, #signout_link:hover {
+            #ok:hover {
                 background-color: white;
             }
             #content {
@@ -114,9 +84,6 @@
             th, td {
                 text-align: center;
                 border-bottom: 1px solid grey;
-            }
-            .alert {
-                color: red;
             }
             .info {
                 color: green;
@@ -134,7 +101,63 @@
     </head>
     <body>
         <h1>Tweexis</h1>
+    <?php
+        require_once("twitteroauth-master/autoload.php");
+        require_once("twitteroauth-master/src/TwitterOAuth.php"); //Path to twitteroauth library
+        session_start();
         
+        if (isset($_POST['pwd'])) {
+            $hashed_password = '$1$DyEB00Pc$fpvjpnOLSdDfnjRXp3cxk0';
+            $user_input = $_POST['pwd'];
+            if (hash_equals($hashed_password, crypt($user_input, $hashed_password))) {
+                $_SESSION['ok'] = true;
+            }
+        }
+        
+        if (!isset($_SESSION['ok'])) {
+    ?>
+        <div class="form">
+            <form action="index.php" method="POST">
+                <input type="password" name="pwd" />
+                <input type="submit" value="OK" id="ok" />
+            </form>
+        </div>
+    <?php
+        } else {
+    ?>  
+
+    <?php
+        if (!isset($_SESSION['connexion'])) {
+            $twitteruser = "Lynus1990";
+            $notweets = 30;
+            $consumerkey = "ZRdeOBWT80jYi1XDXIHn3mQO4";
+            $consumersecret = "Z1pR8rBDvkChGdJCa1Nxs5tUdcue5S1kQkSAmdqxscU6q5upJX";
+            $accesstoken = "537389908-hbnuUkpfPqHSz1tJptxcLsOjOZvraDtdILXKd3FK";
+            $accesstokensecret = "djWWWjur74S0OsHRdfUWxry4X8iXwOVrD3A0rS60a896D";
+            function getConnectionWithAccessToken($cons_key, $cons_secret, $oauth_token, $oauth_token_secret) {
+              $connection = new Abraham\TwitterOAuth\TwitterOAuth($cons_key, $cons_secret, $oauth_token, $oauth_token_secret);
+              return $connection;
+            }
+
+            $connection = getConnectionWithAccessToken($consumerkey, $consumersecret, $accesstoken, $accesstokensecret);
+            $_SESSION['connexion'] = $connection;
+        }
+
+        function readMyFile()
+        {
+            $filename = 'accounts.txt';
+            if (is_file($filename)) {
+                $content = file_get_contents($filename);
+                return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", ',', htmlspecialchars($content));
+            }
+            return false;
+        }
+
+        if (isset($_POST['all_fav'])) {
+            $filename = 'accounts.txt';
+            file_put_contents($filename, $_POST['all_fav']);
+        }
+    ?>
         <div class="info"></div>
         
         <div id="container">            
@@ -146,25 +169,18 @@
             </div>
             
             <div id="content">
-                <form id="add_fav">
-                    <input type="text" placeholder="Entrer un compte" />
-                    <input type="submit" id="add_submit" value="Ajouter aux favoris" />
-                </form>
-                
                 <div id="table_content">
-                    <p id="count_fav">Nombre de favoris : <span class='count_fav'></span></p>
+                    <p id="count_fav">Nombre de favoris (existants) : <span class='count_fav'></span></p>
+                    <form id="add_fav" action="index.php" method="POST">100 maximum
+                        <textarea id="all_fav" name="all_fav" form="add_fav" rows="20" cols="50"></textarea><br/>
+                        <input type="submit" id="add_submit" value="Editer" />
+                    </form>
                     <table id="table_accounts">
                         <tr>
-                            <th>Pseudo</th>
                             <th>Identifiant</th>
+                            <th>Pseudo</th>
                             <th>Nombre d'abonnés</th>
                             <th>Nombre d'abonnements</th>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
                         </tr>
                     </table>
                 </div>
@@ -181,17 +197,26 @@
                 }
                 
                 $('#accounts_link').click(function() {
-                    onglet = 0;
+                    $('#table_accounts').show();
+                    if ($(this).parent().hasClass('active')) {
+                        return;
+                    }
                     $('li').removeClass('active');
                     $(this).parent().addClass('active');
                     init();
                 });
                 
                 $('#favorites_link').click(function() {
-
+                    $('#add_fav').show();
+                    $('li').removeClass('active');
+                    $(this).parent().addClass('active');
+                    $('#table_accounts').hide();
+                    var listUsers = '<?php echo readMyFile(); ?>'.replace(/,/g, '\n');
+                    $('#all_fav').text(listUsers);
                 });
-                
+
                 function fillAccounts() {
+                    $('td').parent().remove();
                     var listUsers = '<?php echo readMyFile(); ?>';
                     $.ajax({
                         type: "POST",
@@ -209,7 +234,18 @@
                                            .replace(/\\f/g, "\\f");
                             s = s.replace(/[\u0000-\u0019]+/g,""); 
                             var array = JSON.parse(s);
-                            console.debug(array);
+                            $('.count_fav').text(array.length);
+                            $.each(array, function(i,value) {
+                                $('#table_accounts').append('<tr><td>'+
+                                    value['screen_name']
+                                +'</td><td>'+
+                                    value['name']
+                                +'</td><td>'+
+                                    value['followers_count']
+                                +'</td><td>'+
+                                    value['friends_count']
+                                +'</td></tr>');
+                            });
                         },
                         error: function(data) {
                             displayError('Non');
@@ -227,6 +263,40 @@
                     $('.info').css('color', 'red').css('font-size', '18px');
                 }
             });
+            
+            var limit = 100; // <---max no of lines you want in textarea
+            var textarea = document.getElementById("all_fav");
+            var spaces = textarea.getAttribute("cols");
+
+            textarea.onkeyup = function() {
+               var lines = textarea.value.split("\n");
+
+               for (var i = 0; i < lines.length; i++) 
+               {
+                     if (lines[i].length <= spaces) continue;
+                     var j = 0;
+
+                    var space = spaces;
+
+                    while (j++ <= spaces) 
+                    {
+                       if (lines[i].charAt(j) === " ") space = j;  
+                    }
+                lines[i + 1] = lines[i].substring(space + 1) + (lines[i + 1] || "");
+                lines[i] = lines[i].substring(0, space);
+              }
+                if(lines.length>limit)
+                {
+                    textarea.style.color = 'red';
+                    setTimeout(function(){
+                        textarea.style.color = '';
+                    },500);
+                }    
+               textarea.value = lines.slice(0, limit).join("\n");
+            };
         </script>
+<?php
+    }
+?>
     </body>
 </html>

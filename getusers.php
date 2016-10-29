@@ -3,6 +3,10 @@ require_once("twitteroauth-master/autoload.php");
 require_once("twitteroauth-master/src/TwitterOAuth.php"); //Path to twitteroauth library
 session_start();
 
+if (!isset($_SESSION['ok'])) {
+    return;
+}
+
 function getAccounts($connection)
 {
     if (isset($_POST['users'])) {
