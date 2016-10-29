@@ -177,10 +177,11 @@
                     </form>
                     <table id="table_accounts">
                         <tr>
-                            <th>Identifiant</th>
-                            <th>Pseudo</th>
-                            <th>Nombre d'abonnés</th>
-                            <th>Nombre d'abonnements</th>
+                            <th><a href="?sort=id">Identifiant</a></th>
+                            <th><a href="?sort=pseudo">Pseudo</a></th>
+                            <th><a href="?sort=followers">Nombre d'abonnés</a></th>
+                            <th><a href="?sort=friends">Nombre d'abonnements</a></th>
+                            <th><a href="?sort=friends">abonnés / abonnements</a></th>
                         </tr>
                     </table>
                 </div>
@@ -235,8 +236,9 @@
                             s = s.replace(/[\u0000-\u0019]+/g,""); 
                             var array = JSON.parse(s);
                             $('.count_fav').text(array.length);
+                            array = sortList(getURLParameter("sort"), array);
                             $.each(array, function(i,value) {
-                                $('#table_accounts').append('<tr><td>'+
+                                $('#table_accounts').append('<tr><td>@'+
                                     value['screen_name']
                                 +'</td><td>'+
                                     value['name']
@@ -244,6 +246,8 @@
                                     value['followers_count']
                                 +'</td><td>'+
                                     value['friends_count']
+                                +'</td></tr>'+
+                                    value['followers_count'] / value['friends_count']
                                 +'</td></tr>');
                             });
                         },
@@ -251,6 +255,32 @@
                             displayError('Non');
                         }
                     });
+                }
+                
+                function getURLParameter(name) {
+                    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+                }
+                
+                function sortList(criteria, array) {
+                    var newArray = array;
+                    switch (criteria) {
+                        case 'id':
+                            
+                            break;
+                        case 'pseudo':
+                            
+                            break;
+                        case 'friends':
+                            
+                            break;
+                        case 'followers':
+                        
+                            break;
+                        case 'ratio':
+                            
+                            break;
+                    }
+                    return newArray;
                 }
 
                 function displayInfo(msg) {
