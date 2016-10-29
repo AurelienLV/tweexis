@@ -3,25 +3,34 @@
     
     <?php
         require_once("twitteroauth-master/autoload.php");
-        session_start();
         require_once("twitteroauth-master/src/TwitterOAuth.php"); //Path to twitteroauth library
+        session_start();
 
-        $twitteruser = "Lynus1990";
-        $notweets = 30;
-        $consumerkey = "ZRdeOBWT80jYi1XDXIHn3mQO4";
-        $consumersecret = "Z1pR8rBDvkChGdJCa1Nxs5tUdcue5S1kQkSAmdqxscU6q5upJX";
-        $accesstoken = "537389908-hbnuUkpfPqHSz1tJptxcLsOjOZvraDtdILXKd3FK";
-        $accesstokensecret = "djWWWjur74S0OsHRdfUWxry4X8iXwOVrD3A0rS60a896D";
+        if (!isset($_SESSION['connexion'])) {
+            $twitteruser = "Lynus1990";
+            $notweets = 30;
+            $consumerkey = "ZRdeOBWT80jYi1XDXIHn3mQO4";
+            $consumersecret = "Z1pR8rBDvkChGdJCa1Nxs5tUdcue5S1kQkSAmdqxscU6q5upJX";
+            $accesstoken = "537389908-hbnuUkpfPqHSz1tJptxcLsOjOZvraDtdILXKd3FK";
+            $accesstokensecret = "djWWWjur74S0OsHRdfUWxry4X8iXwOVrD3A0rS60a896D";
+            function getConnectionWithAccessToken($cons_key, $cons_secret, $oauth_token, $oauth_token_secret) {
+              $connection = new Abraham\TwitterOAuth\TwitterOAuth($cons_key, $cons_secret, $oauth_token, $oauth_token_secret);
+              return $connection;
+            }
 
-        function getConnectionWithAccessToken($cons_key, $cons_secret, $oauth_token, $oauth_token_secret) {
-          $connection = new Abraham\TwitterOAuth\TwitterOAuth($cons_key, $cons_secret, $oauth_token, $oauth_token_secret);
-          return $connection;
+            $connection = getConnectionWithAccessToken($consumerkey, $consumersecret, $accesstoken, $accesstokensecret);
+            $_SESSION['connexion'] = $connection;
         }
 
-        $connection = getConnectionWithAccessToken($consumerkey, $consumersecret, $accesstoken, $accesstokensecret);
-
-        //$content = $connection->get('followers/ids', array('user_id' => '537389908'));
-        //$content = $connection->get('friends/ids', array('screen_name' => 'Lynus1990'));
+        function readMyFile()
+        {
+            $filename = 'accounts.txt';
+            if (is_file($filename)) {
+                $content = file_get_contents($filename);
+                return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", ',', htmlspecialchars($content));
+            }
+            return false;
+        }
     ?>
 
     <head>
@@ -36,11 +45,6 @@
                 text-align: center;
                 margin: 2px;
             }
-            #connection, #search {
-                margin-top: 20px;
-                text-align: center;
-                margin-bottom: 30px;
-            }
             input {
                 border-radius: 8px;
                 border: 2px solid black;
@@ -48,11 +52,6 @@
                 width: 10em;
                 margin-top: 6px;
                 padding: 2px 5px;
-            }
-            #submit, #search_submit {
-                width: 10.8em;
-                background-color: #ddddff;
-                color: #666;
             }
             #onglets {
                 font-size: 1.2em;
@@ -91,9 +90,6 @@
                 border-bottom : 1px solid #9EA0A1;
                 padding-bottom : 34px;
             }
-            #search_submit {
-                width: auto;
-            }
             #me, #signout_link {
                 display: inline-block;
                 margin-left: 10px;
@@ -122,22 +118,30 @@
             .alert {
                 color: red;
             }
+            .info {
+                color: green;
+                font-weight: bold;
+                font-size: 20px;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .count_fav {
+                color: green;
+                font-weight: bold;
+                font-size: 20px;
+            }
         </style>
     </head>
     <body>
         <h1>Tweexis</h1>
         
-        <form id="search">
-            <input type="text" placeholder="Chercher un compte" id="search_user" />
-            <input type="submit" id="search_submit" value="OK" />
-        </form>
+        <div class="info"></div>
         
         <div id="container">            
             <div id="menu">
                 <ul id="onglets">
-                    <li class="active"><a href="#" id="followers_link"> Abonnés </a></li>
-                    <li><a href="#" id="followings_link"> Abonnements </a></li>
-                    <li><a href="#" id="favorites_link"> Favoris </a></li>
+                    <li class="active"><a href="#" id="accounts_link"> Surveiller </a></li>
+                    <li><a href="#" id="favorites_link"> Gérer les comptes </a></li>
                 </ul>
             </div>
             
@@ -147,11 +151,9 @@
                     <input type="submit" id="add_submit" value="Ajouter aux favoris" />
                 </form>
                 
-                <div id="follow_content">
-                    <p id="count_followers">Nombre d'abonnés : <span class='count_followers'></span></p>
-                    <p id="count_followings">Nombre d'abonnements : <span class='count_followings'></span></p>
+                <div id="table_content">
                     <p id="count_fav">Nombre de favoris : <span class='count_fav'></span></p>
-                    <table id="follows">
+                    <table id="table_accounts">
                         <tr>
                             <th>Pseudo</th>
                             <th>Identifiant</th>
@@ -171,67 +173,59 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
         <script language="JavaScript">
             $( document ).ready(function() {
-                function redirect(u, o) {
-                    document.location.href = 'index.php?user='+u;
-                    return false;
-                }
-                var getUrlParameter = function getUrlParameter(sParam) {
-                    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-                        sURLVariables = sPageURL.split('&'),
-                        sParameterName,
-                        i;
-
-                    for (i = 0; i < sURLVariables.length; i++) {
-                        sParameterName = sURLVariables[i].split('=');
-
-                        if (sParameterName[0] === sParam) {
-                            return sParameterName[1] === undefined ? true : sParameterName[1];
-                        }
-                    }
-                };
-                var user = getUrlParameter('user');
                 init();
 
-                $('#search_submit').click(function() {
-                    user = $('#search_user').val();
-                    return redirect(user);
-                });
-
                 function init() {
-                    $('#count_followers').show();
-                    $('#count_followings').hide();
-                    $('#count_fav').hide();
                     $('#add_fav').hide();
+                    fillAccounts();
                 }
                 
-                $('#followers_link').click(function() {
+                $('#accounts_link').click(function() {
+                    onglet = 0;
                     $('li').removeClass('active');
                     $(this).parent().addClass('active');
                     init();
                 });
                 
-                $('#followings_link').click(function() {
-                    $('li').removeClass('active');
-                    $(this).parent().addClass('active');
-                    $('#count_followings').show();
-                    $('#count_followers').hide();
-                    $('#count_fav').hide();
-                    $('#add_fav').hide();
+                $('#favorites_link').click(function() {
+
                 });
                 
-                $('#favorites_link').click(function() {
-                    $('li').removeClass('active');
-                    $(this).parent().addClass('active');
-                    $('#count_fav').show();
-                    $('#count_followers').hide();
-                    $('#count_followings').hide();
-                    $('#add_fav').show();
-                });
+                function fillAccounts() {
+                    var listUsers = '<?php echo readMyFile(); ?>';
+                    $.ajax({
+                        type: "POST",
+                        url: "getusers.php",
+                        datatype: "html",
+                        data: {'users': listUsers},
+                        success: function(data) {
+                            var s = $('<div/>').html(data).text();
+                            s = s.replace(/\\n/g, "\\n")  
+                                           .replace(/\\"/g, '\\"')
+                                           .replace(/\\&/g, "\\&")
+                                           .replace(/\\r/g, "\\r")
+                                           .replace(/\\t/g, "\\t")
+                                           .replace(/\\b/g, "\\b")
+                                           .replace(/\\f/g, "\\f");
+                            s = s.replace(/[\u0000-\u0019]+/g,""); 
+                            var array = JSON.parse(s);
+                            console.debug(array);
+                        },
+                        error: function(data) {
+                            displayError('Non');
+                        }
+                    });
+                }
 
-                /*if (onglet === 0) {
-                    var result = <?php /*echo $connection->get('followers/ids', array('screen_name' => $_GET['user']));*/ ?>
-                    alert(result);
-                }*/
+                function displayInfo(msg) {
+                    $('.info').text(msg);
+                    $('.info').css('color', 'green').css('font-size', '18px');
+                }
+                
+                function displayError(msg) {
+                    $('.info').text(msg)
+                    $('.info').css('color', 'red').css('font-size', '18px');
+                }
             });
         </script>
     </body>
