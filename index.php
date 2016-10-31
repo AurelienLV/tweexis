@@ -263,7 +263,7 @@
             (généralement un quart d'heure) avant de recharger la page car cela peut suffire.
             Il n'y a pas de "profil utilisateur" sur ce site. Cela signifie que la section "Gérer les comptes" n'a qu'une seule version du formulaire.
             La liste des comptes est donc connue par tous ceux qui peuvent accéder au site, mais tu es normalement le seul.
-            Tu n'auras pas besoin de rentrer le mot de passe tant que tes cookies n'ont pas expiré.
+            Tu n'auras pas besoin de rentrer le mot de passe tant que ta session n'a pas expiré et que tu ne fermes pas la page.
             
         </div>
         <div class="modal"><!-- Place at bottom of page --></div>
