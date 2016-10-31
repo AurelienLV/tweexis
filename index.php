@@ -11,11 +11,16 @@
         <style type="text/css">
             body {
                 font-size: 1.2em;
+                background-image: url("wrinkled-600.jpg");
             }
             h1 {
                 font-size: 3em;
                 text-align: center;
                 margin: 2px;
+                margin-left: -10%;
+                background: -webkit-linear-gradient(#00f, orange);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
             }
             input {
                 border-radius: 8px;
@@ -39,27 +44,24 @@
             #onglets li {
                 float : left;
                 height : 30px;
-                background-color: #ddddff;
+                background-color: #ffdd77;
                 margin : 2px 2px 0 2px !important;
                 margin : 1px 2px 0 2px;
-                border : 1px solid #9EA0A1;
+                border : 1px solid #dd9944;
             }
             #onglets li.active {
-                border-bottom: 1px solid #fff;
-                background-color: #fff;
+                border-bottom: 1px solid rgba(243, 227, 172, 1);
+                background-color: rgba(0, 0, 0, 0);
             }
             #onglets a {
                 display : block;
-                color : #666;
+                color : #555;
                 text-decoration : none;
                 padding : 4px;
             }
-            #onglets a:hover {
-                background : #fff;
-            }
             #menu {
                 margin-top: 10px;
-                border-bottom : 1px solid #9EA0A1;
+                border-bottom : 1px solid #dd9944;
                 padding-bottom : 34px;
             }
             .form {
@@ -86,6 +88,14 @@
             table {
                 margin: auto;
             }
+            th {
+                min-height: 200px;
+                background-color: rgba(255, 255, 0, 0.2);
+            }
+            tr > th {
+                padding: 12px;
+            }
+            tr:nth-child(even) {background-color: rgba(255, 0, 0, 0.1); }
             th, td {
                 text-align: center;
                 border-bottom: 1px solid grey;
@@ -136,10 +146,27 @@
             body.loading .modal {
                  display: block;
             }
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+            .arrow {
+                width: 10px;
+                height: 10px;
+            }
+            .help {
+                background-color: rgba(0, 255, 0, 0.2);
+                border-radius: 20px;
+                margin: 30px 20%;
+                color: green;
+                font-size: 14px;
+                text-align: justify;
+                padding: 10px;
+            }
         </style>
     </head>
     <body>
-        <h1>Tweexis</h1>
+        <h1><img src="bird.png" alt="logo" class="logo" /> Tweexis</h1>
     <?php
         
         if (isset($_POST['pwd'])) {
@@ -206,25 +233,38 @@
             
             <div id="content">
                 <div id="table_content">
-                    <p id="count_fav">Nombre de favoris (existants) : <span class='count_fav'></span></p>
+                    <p id="count_fav">Nombre de favoris (existants) : <span class='count_fav'>0</span></p>
                     
                     <table id="table_accounts">
                         <tr>
                             <th></th>
-                            <th><a href="?sort=id&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'id' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>">Identifiant</a></th>
-                            <th><a href="?sort=pseudo&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'pseudo' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>">Pseudo</a></th>
-                            <th><a href="?sort=followers&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'followers' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>">Nombre d'abonnés</a></th>
-                            <th><a href="?sort=friends&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'friends' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>">Nombre d'abonnements</a></th>
-                            <th><a href="?sort=ratio&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'ratio' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>">abonnés / abonnements</a></th>
+                            <th><a id="a_id" href="?sort=id&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'id' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>"><span>Identifiant</span></a></th>
+                            <th><a id="a_pseudo" href="?sort=pseudo&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'pseudo' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>"><span>Pseudo</span></a></th>
+                            <th><a id="a_followers" href="?sort=followers&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'followers' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>"><span>Nombre d'abonnés</span></a></th>
+                            <th><a id="a_friends" href="?sort=friends&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'friends' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>"><span>Nombre d'abonnements</span></a></th>
+                            <th><a id="a_ratio" href="?sort=ratio&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'ratio' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>"><span>abonnés / abonnements</span></a></th>
                         </tr>
                     </table>
                     
-                    <form id="add_fav" action="index.php" method="POST">100 maximum
+                    <form id="add_fav" action="index.php" method="POST">100 maximum<br/>
                         <textarea id="all_fav" name="all_fav" form="add_fav" rows="20" cols="50"></textarea><br/>
                         <input type="submit" id="add_submit" value="Editer" />
                     </form>
                 </div>
             </div>
+        </div>
+        <div class="help">
+            AIDE : Dans la section "Gérer les comptes", entre les identifiants des comptes (sans le @), un par ligne.
+            Twitter n'autorise la recherche simulatée que de 100 comptes maximum.
+            Seuls les identifiants entrés correctement s'affichent dans la section "Surveiller" (tu peux cliquer dessus pour rejoindre leur profil Twitter).
+            Dans cette section, tu peux cliquer sur les noms de colonnes pour trier selon elles, d'abord dans l'ordre croissant, puis
+            décroissant si tu cliques encore sur le nom de colonne. Le tri par défaut quand on recharge la page dépend de la liste des identifiants entrés.
+            Sache que Twitter limite le nombre de recherches de ses données pour un laps de temps ; en cas de souci, attends quelques minutes
+            (généralement un quart d'heure) avant de recharger la page car cela peut suffire.
+            Il n'y a pas de "profil utilisateur" sur ce site. Cela signifie que la section "Gérer les comptes" n'a qu'une seule version du formulaire.
+            La liste des comptes est donc connue par tous ceux qui peuvent accéder au site, mais tu es normalement le seul.
+            Tu n'auras pas besoin de rentrer le mot de passe tant que tes cookies n'ont pas expiré.
+            
         </div>
         <div class="modal"><!-- Place at bottom of page --></div>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -237,6 +277,12 @@
 
                 function init() {
                     $('#add_fav').hide();
+                    $('#a_'+getURLParameter('sort')).parent().css('background-color', 'rgba(255, 255, 0, 0.6)');
+                    if (getURLParameter('order') === 'asc') {
+                        $('#a_'+getURLParameter('sort')).parent().append(' <img class="arrow" src="asc.png" />');
+                    } else if (getURLParameter('order') === 'desc') {
+                        $('#a_'+getURLParameter('sort')).parent().append(' <img class="arrow" src="desc.png" />');
+                    }
                     fillAccounts();
                 }
                 
@@ -247,7 +293,9 @@
                     }
                     $('li').removeClass('active');
                     $(this).parent().addClass('active');
-                    init();
+                    $('#add_fav').hide();
+                    $('#a_'+getURLParameter('sort')).parent().css('background-color', 'rgba(255, 255, 0, 0.6)');
+                    fillAccounts();
                 });
                 
                 $('#favorites_link').click(function() {
@@ -268,6 +316,7 @@
                         datatype: "html",
                         data: {'users': listUsers},
                         success: function(data) {
+                            if (!data) { $('#table_accounts').append('<tr style="color: grey"><td colspan="10"><i>aucun compte existant</i></td></tr>'); return; }
                             var s = $('<div/>').html(data).text();
                             s = s.replace(/\\n/g, "\\n")  
                                            .replace(/\\"/g, '\\"')
