@@ -237,6 +237,7 @@
                     
                     <table id="table_accounts">
                         <tr>
+							<th></th>
                             <th></th>
                             <th><a id="a_id" href="?sort=id&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'id' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>"><span>Identifiant</span></a></th>
                             <th><a id="a_pseudo" href="?sort=pseudo&order=<?php if (isset($_GET['order']) && isset($_GET['sort']) && $_GET['sort'] == 'pseudo' && $_GET['order'] == 'asc') { echo 'desc'; } else { echo 'asc'; } ?>"><span>Pseudo</span></a></th>
@@ -330,7 +331,7 @@
                             $('.count_fav').text(array.length);
                             array = sortList(getURLParameter("sort"), array);
                             $.each(array, function(i,value) {
-                                $('#table_accounts').append('<tr><td>'+
+                                $('#table_accounts').append('<tr><td>'+(i+1)+'</td><td>'+
                                     '<img src="'+value['profile_image_url']+'" />'
                                 +'</td><td><a target="_blank" href="http://www.twitter.com/'+value['screen_name']+'">@'+
                                     value['screen_name']
